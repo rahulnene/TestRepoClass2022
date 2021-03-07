@@ -2,10 +2,25 @@ import nistrng
 import math
 from fractions import Fraction
 from gamma_functions import *
-from sp800_22_monobit_test import monobit_test
 
 bit_file = open("petra.txt", "r")
 
+testlist = [
+    'monobit_test',
+    'frequency_within_block_test',
+    'runs_test',
+    'longest_run_ones_in_a_block_test',
+    'binary_matrix_rank_test',
+    'dft_test',
+    'non_overlapping_template_matching_test',
+    'overlapping_template_matching_test',
+    'maurers_universal_test',
+    'linear_complexity_test',
+    'serial_test',
+    'approximate_entropy_test',
+    'cumulative_sums_test',
+    'random_excursion_test',
+    'random_excursion_variant_test']
 
 def count_ones_zeroes(bitstream):
     ones = 0
@@ -20,48 +35,26 @@ def count_ones_zeroes(bitstream):
 
 
 
-def frequency_within_block_test(bits):
-    # Compute number of blocks M = block size. N=num of blocks
-    # N = floor(n/M)
-    # miniumum block size 20 bits, most blocks 100
-    n = len(bits)
-    M = 20
-    N = int(math.floor(n / M))
-    if N > 99:
-        N = 99
-        M = int(math.floor(n / N))
-
-    if len(bits) < 100:
-        print("Too little data for test. Supply at least 100 bits")
-        return False, 1.0, None
-
-    print("  n = %d" % len(bits))
-    print("  N = %d" % N)
-    print("  M = %d" % M)
-
-    num_of_blocks = N
-    block_size = M  # int(math.floor(len(bits)/num_of_blocks))
-    # n = int(block_size * num_of_blocks)
-
-    proportions = list()
-    for i in range(num_of_blocks):
-        block = bits[i * block_size:((i + 1) * block_size)]
-        zeroes, ones = count_ones_zeroes(block)
-        proportions.append(Fraction(ones, block_size))
-
-    chisq = 0.0
-    for prop in proportions:
-        chisq += 4.0 * block_size * ((prop - Fraction(1, 2)) ** 2)
-
-    p = gammaincc((num_of_blocks / 2.0), float(chisq) / 2.0)
-    success = (p >= 0.01)
-    return success, p
-
 
 bits = []
 
 for line in bit_file:
     bits.append(int(line.split(" ")[1][0]))
 
-print(monobit_test(bits))
-print(frequency_within_block_test(bits))
+for test in testlist:
+        m = __import__("sp800_22_" + test)
+        func = getattr(m, test)
+        print("TEST: %s" % test)
+        success, p, plist = func(bits)
+        gotresult = True
+        if success:
+            print("PASS")
+        else:
+            print("FAIL")
+
+        if p:
+            print("P=" + str(p))
+
+        if plist:
+            for pval in plist:
+                print("P=" + str(pval))
