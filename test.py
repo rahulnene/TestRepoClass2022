@@ -32,12 +32,8 @@ def count_ones_zeroes(bitstream):
             zeroes += 1
     return zeroes, ones
 
-
-
-
-
 bits = []
-
+success_count, fail_count = 0,0
 for line in bit_file:
     bits.append(int(line.split(" ")[1][0]))
 
@@ -46,15 +42,12 @@ for test in testlist:
         func = getattr(m, test)
         print("TEST: %s" % test)
         success, p, plist = func(bits)
-        gotresult = True
         if success:
             print("PASS")
+            success_count += 1
         else:
             print("FAIL")
+            fail_count += 1
 
-        if p:
-            print("P=" + str(p))
 
-        if plist:
-            for pval in plist:
-                print("P=" + str(pval))
+print(success_count,fail_count)

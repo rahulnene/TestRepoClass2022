@@ -27,6 +27,7 @@ import math
 
 # RANDOM EXCURSION VARIANT TEST
 def random_excursion_variant_test(bits):
+    irrelevant = False
     n = len(bits)
 
     x = list()  # Convert to +1,-1
@@ -71,8 +72,9 @@ def random_excursion_variant_test(bits):
 
     if (J < 500):
         print("J too small (J=%d < 500) for result to be reliable" % J)
+        irrelevant = True
     elif success:
         print("PASS")
     else:
         print("FAIL: Data not random")
-    return (success, None, plist)
+    return success, None, plist
